@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>โป่งลีกคัพ 2569</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0f172a;font-family:'Noto Sans Thai','Sarabun',sans-serif;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:4px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCYbCXGyzdtJJu6Xg3WpD8lTJKixRycYWM",
+  authDomain: "football-league-602e8.firebaseapp.com",
+  databaseURL: "https://football-league-602e8-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "football-league-602e8",
+  storageBucket: "football-league-602e8.firebasestorage.app",
+  messagingSenderId: "949223549061",
+  appId: "1:949223549061:web:c85524431c101052b1a1ec"
+});
+</script>
+
+<!-- React -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+<script type="text/babel">
+import { useState, useEffect } from "react";
+
+const TEAMS = [
+  {id:1,name:"สานิตย์",s:"สนต",e:"🔴",c:"#dc2626",c2:"#fff"},
+  {id:2,name:"กระท้อนหวาน",s:"กทว",e:"🟡",c:"#f59e0b",c2:"#000"},
+  {id:3,name:"หกสีเอี่ยว",s:"หสอ",e:"🟢",c:"#059669",c2:"#fff"},
+  {id:4,name:"รวมมิตร",s:"รมต",e:"⚫",c:"#374151",c2:"#fff"},
+  {id:5,name:"นพพลไก่ย่าง",s:"นพล",e:"🟠",c:"#ea580c",c2:"#fff"},
+  {id:6,name:"มดตานอย",s:"มตน",e:"🔵",c:"#2563eb",c2:"#fff"},
+  {id:7,name:"บ้านบน",s:"บบน",e:"⚪",c:"#9ca3af",c2:"#000"},
+  {id:8,name:"สุภาวุฒิ",s:"สภว",e:"🟣",c:"#9333ea",c2:"#fff"},
+];
+
+const V = "สนามกีฬาหน้าเทศบาลตำบลโป่ง";
+const MATCHES_INIT = [
+  {id:1,h:1,a:2,hs:null,as:null,d:"2026-06-06",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:2,h:3,a:4,hs:null,as:null,d:"2026-06-06",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:3,h:5,a:6,hs:null,as:null,d:"2026-06-07",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:4,h:7,a:8,hs:null,as:null,d:"2026-06-07",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:5,h:3,a:8,hs:null,as:null,d:"2026-06-13",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:6,h:1,a:5,hs:null,as:null,d:"2026-06-13",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:7,h:4,a:7,hs:null,as:null,d:"2026-06-14",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:8,h:2,a:6,hs:null,as:null,d:"2026-06-14",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:9,h:2,a:7,hs:null,as:null,d:"2026-06-20",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:10,h:4,a:5,hs:null,as:null,d:"2026-06-20",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:11,h:1,a:8,hs:null,as:null,d:"2026-06-21",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:12,h:3,a:6,hs:null,as:null,d:"2026-06-21",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:13,h:1,a:4,hs:null,as:null,d:"2026-06-27",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:14,h:8,a:6,hs:null,as:null,d:"2026-06-27",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:15,h:7,a:3,hs:null,as:null,d:"2026-06-28",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:16,h:5,a:2,hs:null,as:null,d:"2026-06-28",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:17,h:4,a:8,hs:null,as:null,d:"2026-07-04",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:18,h:7,a:5,hs:null,as:null,d:"2026-07-04",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:19,h:2,a:3,hs:null,as:null,d:"2026-07-05",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:20,h:6,a:1,hs:null,as:null,d:"2026-07-05",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:21,h:6,a:7,hs:null,as:null,d:"2026-07-11",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:22,h:1,a:3,hs:null,as:null,d:"2026-07-11",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:23,h:5,a:8,hs:null,as:null,d:"2026-07-12",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:24,h:2,a:4,hs:null,as:null,d:"2026-07-12",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:25,h:8,a:7,hs:null,as:null,d:"2026-07-18",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:26,h:3,a:5,hs:null,as:null,d:"2026-07-18",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:27,h:4,a:1,hs:null,as:null,d:"2026-07-19",t:"16:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:28,h:2,a:6,hs:null,as:null,d:"2026-07-19",t:"18:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:29,h:2,a:1,hs:null,as:null,d:"2026-08-01",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:30,h:4,a:3,hs:null,as:null,d:"2026-08-01",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:31,h:6,a:5,hs:null,as:null,d:"2026-08-02",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:32,h:8,a:7,hs:null,as:null,d:"2026-08-02",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:33,h:8,a:3,hs:null,as:null,d:"2026-08-08",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:34,h:5,a:1,hs:null,as:null,d:"2026-08-08",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:35,h:7,a:4,hs:null,as:null,d:"2026-08-09",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:36,h:6,a:2,hs:null,as:null,d:"2026-08-09",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:37,h:7,a:2,hs:null,as:null,d:"2026-08-15",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:38,h:5,a:4,hs:null,as:null,d:"2026-08-15",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:39,h:8,a:1,hs:null,as:null,d:"2026-08-16",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:40,h:6,a:3,hs:null,as:null,d:"2026-08-16",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:41,h:4,a:1,hs:null,as:null,d:"2026-08-22",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:42,h:6,a:8,hs:null,as:null,d:"2026-08-22",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:43,h:3,a:7,hs:null,as:null,d:"2026-08-23",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:44,h:2,a:5,hs:null,as:null,d:"2026-08-23",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:45,h:8,a:4,hs:null,as:null,d:"2026-08-29",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:46,h:5,a:7,hs:null,as:null,d:"2026-08-29",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:47,h:3,a:2,hs:null,as:null,d:"2026-08-30",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:48,h:1,a:6,hs:null,as:null,d:"2026-08-30",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:49,h:7,a:6,hs:null,as:null,d:"2026-09-05",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:50,h:3,a:1,hs:null,as:null,d:"2026-09-05",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:51,h:8,a:5,hs:null,as:null,d:"2026-09-06",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:52,h:4,a:2,hs:null,as:null,d:"2026-09-06",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:53,h:7,a:8,hs:null,as:null,d:"2026-09-12",t:"17:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:54,h:5,a:3,hs:null,as:null,d:"2026-09-12",t:"18:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:55,h:1,a:4,hs:null,as:null,d:"2026-09-13",t:"16:30",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+  {id:56,h:6,a:2,hs:null,as:null,d:"2026-09-13",t:"18:00",v:V,st:"กำหนดการ",sc:[],yc:[],rc:[]},
+];
+
+const BANNERS_INIT = [
+  {id:1,name:"ผู้สนับสนุนหลัก",url:"https://placehold.co/800x80/dc2626/fff?text=โป่งลีกคัพ+2569+ผู้สนับสนุนหลัก",link:"#",on:true},
+  {id:2,name:"สปอนเซอร์ 2",url:"https://placehold.co/800x80/f59e0b/000?text=SPONSOR+2",link:"#",on:true},
+  {id:3,name:"สปอนเซอร์ 3",url:"https://placehold.co/800x80/059669/fff?text=SPONSOR+3",link:"#",on:true},
+  {id:4,name:"สปอนเซอร์ 4",url:"https://placehold.co/800x80/2563eb/fff?text=SPONSOR+4",link:"#",on:true},
+  {id:5,name:"สปอนเซอร์ 5",url:"https://placehold.co/800x80/9333ea/fff?text=SPONSOR+5",link:"#",on:true},
+];
+
+function useSave(key, init) {
+  const [v, setV] = useState(init);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const r = firebase.database().ref(key);
+    r.on('value', snap => {
+      if (snap.exists()) {
+        const val = snap.val();
+        setV(Array.isArray(init) ? Object.values(val) : val);
+      } else {
+        r.set(Array.isArray(init)
+          ? Object.fromEntries(init.map((x,i)=>[i,x]))
+          : init);
+        setV(init);
+      }
+      setReady(true);
+    });
+    return () => r.off();
+  }, [key]);
+  const save = (nv) => {
+    const val = typeof nv === "function" ? nv(v) : nv;
+    setV(val);
+    firebase.database().ref(key).set(
+      Array.isArray(val)
+        ? Object.fromEntries(val.map((x,i)=>[i,x]))
+        : val
+    );
+  };
+  return [v, save, ready];
+}
+
+function calcTable(teams,matches){
+  const t=teams.map(x=>({...x,mp:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0,yc:0,rc:0,form:[]}));
+  matches.filter(m=>m.st==="จบแล้ว"&&m.hs!=null).forEach(m=>{
+    const h=t.find(x=>x.id===m.h),a=t.find(x=>x.id===m.a);
+    if(!h||!a)return;
+    h.mp++;a.mp++;h.gf+=m.hs;h.ga+=m.as;a.gf+=m.as;a.ga+=m.hs;
+    if(m.hs>m.as){h.w++;h.pts+=3;a.l++;h.form.push("W");a.form.push("L");}
+    else if(m.hs<m.as){a.w++;a.pts+=3;h.l++;h.form.push("L");a.form.push("W");}
+    else{h.d++;h.pts++;a.d++;a.pts++;h.form.push("D");a.form.push("D");}
+    m.yc?.forEach(c=>{const x=t.find(y=>y.id===c.team);if(x)x.yc++;});
+    m.rc?.forEach(c=>{const x=t.find(y=>y.id===c.team);if(x)x.rc++;});
+  });
+  t.forEach(x=>x.gd=x.gf-x.ga);
+  return t.sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf);
+}
+
+const gt=(teams,id)=>teams.find(t=>t.id===id);
+const fd=(d)=>new Date(d).toLocaleDateString("th-TH",{day:"numeric",month:"short"});
+
+function Logo({t,sz=36}){
+  if(!t)return null;
+  return <div style={{width:sz,height:sz,borderRadius:"50%",background:t.c,border:`2px solid ${t.c2}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:sz*0.44,flexShrink:0}}>{t.e}</div>;
+}
+
+function FB({r}){
+  const bg=r==="W"?"#059669":r==="D"?"#d97706":"#dc2626";
+  return <span style={{width:20,height:20,borderRadius:4,background:bg,color:"#fff",fontSize:10,fontWeight:700,display:"inline-flex",alignItems:"center",justifyContent:"center",margin:"0 1px"}}>{r}</span>;
+}
+
+function Live(){
+  const [v,setV]=useState(true);
+  useEffect(()=>{const t=setInterval(()=>setV(x=>!x),800);return()=>clearInterval(t);},[]);
+  return <span style={{background:"#dc2626",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 6px",borderRadius:4,opacity:v?1:0.3,transition:"opacity 0.3s"}}>LIVE</span>;
+}
+
+function Banner({banners}){
+  const [i,setI]=useState(0);
+  const on=banners.filter(b=>b.on);
+  useEffect(()=>{if(!on.length)return;const t=setInterval(()=>setI(x=>(x+1)%on.length),3500);return()=>clearInterval(t);},[on.length]);
+  if(!on.length)return null;
+  return(
+    <div style={{background:"#0f172a",position:"relative"}}>
+      <img src={on[i].url} alt={on[i].name} style={{width:"100%",maxHeight:80,objectFit:"cover",display:"block"}} onError={e=>{e.target.style.minHeight="40px";e.target.style.background="#1e293b";}}/>
+      <div style={{position:"absolute",bottom:5,right:8,display:"flex",gap:4}}>
+        {on.map((_,j)=><div key={j} onClick={()=>setI(j)} style={{width:5,height:5,borderRadius:"50%",background:i===j?"#f59e0b":"#475569",cursor:"pointer"}}/>)}
+      </div>
+    </div>
+  );
+}
+
+function MatchCard({m,teams,compact}){
+  const h=gt(teams,m.h),a=gt(teams,m.a);
+  if(!h||!a)return null;
+  const live=m.st==="กำลังแข่ง",done=m.st==="จบแล้ว";
+  return(
+    <div style={{background:"#1e293b",borderRadius:10,padding:"10px 12px",border:live?"1px solid #dc2626":"1px solid #334155"}}>
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flex:1,minWidth:0}}>
+          <Logo t={h} sz={36}/>
+          <span style={{color:"#f1f5f9",fontSize:11,fontWeight:700,textAlign:"center",lineHeight:1.3}}>{h.name}</span>
+        </div>
+        <div style={{textAlign:"center",minWidth:76,flexShrink:0}}>
+          {done||live
+            ? <div style={{fontSize:22,fontWeight:900,color:"#f8fafc",letterSpacing:3}}>{m.hs}-{m.as}</div>
+            : <div style={{fontSize:17,color:"#f59e0b",fontWeight:900}}>{m.t}</div>}
+          <div style={{marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+            {live?<Live/>:<span style={{fontSize:10,color:"#64748b"}}>{m.st}</span>}
+          </div>
+          {!compact&&<div style={{fontSize:10,color:"#475569",marginTop:1}}>{fd(m.d)}</div>}
+        </div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flex:1,minWidth:0}}>
+          <Logo t={a} sz={36}/>
+          <span style={{color:"#f1f5f9",fontSize:11,fontWeight:700,textAlign:"center",lineHeight:1.3}}>{a.name}</span>
+        </div>
+      </div>
+      {done&&m.sc?.length>0&&(
+        <div style={{marginTop:6,borderTop:"1px solid #334155",paddingTop:5,display:"flex",flexWrap:"wrap",gap:3}}>
+          {m.sc.map((s,i)=><span key={i} style={{fontSize:10,color:"#94a3b8",background:"#0f172a",borderRadius:4,padding:"1px 5px"}}>⚽{s.min}' {s.player}</span>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Confirm({msg,onOk,onCancel}){
+  return(
+    <div style={{position:"fixed",inset:0,background:"#000c",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{background:"#1e293b",borderRadius:14,padding:22,width:"100%",maxWidth:300,border:"1px solid #475569"}}>
+        <div style={{fontSize:28,textAlign:"center",marginBottom:10}}>🗑️</div>
+        <div style={{color:"#f1f5f9",fontSize:14,fontWeight:600,textAlign:"center",marginBottom:18,lineHeight:1.5}}>{msg}</div>
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={onCancel} style={{flex:1,background:"#334155",color:"#cbd5e1",border:"none",borderRadius:8,padding:"11px 0",fontWeight:700,cursor:"pointer"}}>ยกเลิก</button>
+          <button onClick={onOk} style={{flex:1,background:"#dc2626",color:"#fff",border:"none",borderRadius:8,padding:"11px 0",fontWeight:700,cursor:"pointer"}}>ลบเลย</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PAGES ──
+function Home({teams,matches,banners}){
+  const tb=calcTable(teams,matches);
+  const live=matches.find(m=>m.st==="กำลังแข่ง");
+  const next=matches.find(m=>m.st==="กำหนดการ");
+  const goals={};
+  matches.forEach(m=>m.sc?.forEach(s=>{if(!goals[s.player])goals[s.player]={n:s.player,t:s.team,c:0};goals[s.player].c++;}));
+  const top=Object.values(goals).sort((a,b)=>b.c-a.c).slice(0,5);
+  return(
+    <div>
+      <Banner banners={banners}/>
+      {live&&(
+        <div style={{background:"linear-gradient(135deg,#7f1d1d,#991b1b)",padding:12,margin:12,borderRadius:12,border:"1px solid #dc2626"}}>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}><Live/><span style={{color:"#fca5a5",fontSize:12,fontWeight:600}}>กำลังแข่งอยู่!</span></div>
+          <MatchCard m={live} teams={teams} compact/>
+        </div>
+      )}
+      {next&&(
+        <div style={{background:"#0f172a",padding:12,margin:12,borderRadius:12,border:"1px solid #1e40af"}}>
+          <div style={{color:"#93c5fd",fontSize:11,marginBottom:6,fontWeight:600}}>นัดถัดไป: {fd(next.d)} {next.t}</div>
+          <MatchCard m={next} teams={teams} compact/>
+        </div>
+      )}
+      <div style={{padding:"0 12px 12px"}}>
+        <div style={{color:"#f8fafc",fontSize:14,fontWeight:700,marginBottom:8}}>🏆 ตารางคะแนน</div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+            <thead><tr style={{borderBottom:"1px solid #334155"}}>
+              {["#","ทีม","แข่ง","W","D","L","GD","คะแนน","ฟอร์ม"].map(h=>(
+                <th key={h} style={{padding:"4px 3px",color:"#64748b",textAlign:h==="ทีม"?"left":"center",whiteSpace:"nowrap"}}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {tb.map((t,i)=>(
+                <tr key={t.id} style={{borderBottom:"1px solid #1e293b"}}>
+                  <td style={{padding:"6px 3px",color:i<3?"#f59e0b":"#94a3b8",fontWeight:700,textAlign:"center"}}>{i+1}</td>
+                  <td style={{padding:"6px 3px"}}><div style={{display:"flex",alignItems:"center",gap:5}}><Logo t={t} sz={20}/><span style={{color:"#f1f5f9",fontWeight:600,fontSize:11}}>{t.name}</span></div></td>
+                  {[t.mp,t.w,t.d,t.l,t.gd>0?`+${t.gd}`:t.gd].map((v,j)=>(
+                    <td key={j} style={{padding:"6px 3px",color:"#cbd5e1",textAlign:"center"}}>{v}</td>
+                  ))}
+                  <td style={{padding:"6px 3px",color:"#f59e0b",fontWeight:900,textAlign:"center",fontSize:13}}>{t.pts}</td>
+                  <td style={{padding:"6px 3px"}}><div style={{display:"flex"}}>{t.form.slice(-3).map((f,j)=><FB key={j} r={f}/>)}</div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {top.length>0&&(
+          <div style={{marginTop:14}}>
+            <div style={{color:"#f8fafc",fontSize:13,fontWeight:700,marginBottom:8}}>⚽ ดาวซัลโว</div>
+            {top.map((s,i)=>(
+              <div key={s.n} style={{display:"flex",alignItems:"center",gap:8,background:"#1e293b",borderRadius:8,padding:"6px 10px",marginBottom:5}}>
+                <span style={{color:"#f59e0b",fontWeight:900,width:18,textAlign:"center"}}>{i+1}</span>
+                <Logo t={gt(teams,s.t)} sz={24}/>
+                <span style={{flex:1,color:"#f1f5f9",fontWeight:600,fontSize:12}}>{s.n}</span>
+                <span style={{color:"#f59e0b",fontWeight:900}}>⚽{s.c}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Fixtures({teams,matches}){
+  const [f,setF]=useState("ทั้งหมด");
+  const ss=["ทั้งหมด","กำหนดการ","กำลังแข่ง","จบแล้ว"];
+  const list=f==="ทั้งหมด"?[...matches].sort((a,b)=>a.d.localeCompare(b.d)):[...matches].filter(m=>m.st===f).sort((a,b)=>a.d.localeCompare(b.d));
+  return(
+    <div style={{padding:12}}>
+      <div style={{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}}>
+        {ss.map(s=>(
+          <button key={s} onClick={()=>setF(s)} style={{padding:"5px 12px",borderRadius:20,border:"none",background:f===s?"#f59e0b":"#1e293b",color:f===s?"#0f172a":"#94a3b8",fontWeight:600,fontSize:11,cursor:"pointer"}}>{s}</button>
+        ))}
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {list.map(m=><MatchCard key={m.id} m={m} teams={teams}/>)}
+        {list.length===0&&<div style={{textAlign:"center",padding:30,color:"#64748b"}}>ไม่มีแมตช์</div>}
+      </div>
+    </div>
+  );
+}
+
+function Standings({teams,matches}){
+  const tb=calcTable(teams,matches);
+  return(
+    <div style={{padding:12}}>
+      <div style={{color:"#f8fafc",fontSize:14,fontWeight:700,marginBottom:10}}>🏆 ตารางคะแนน</div>
+      <div style={{overflowX:"auto",marginBottom:16}}>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+          <thead><tr style={{borderBottom:"1px solid #334155"}}>
+            {["#","ทีม","แข่ง","W","D","L","GF","GA","GD","PTS","ฟอร์ม"].map(h=>(
+              <th key={h} style={{padding:"5px 3px",color:"#64748b",textAlign:h==="ทีม"?"left":"center",whiteSpace:"nowrap"}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>
+            {tb.map((t,i)=>(
+              <tr key={t.id} style={{borderBottom:"1px solid #1e293b",background:i<3?"#f59e0b08":"transparent"}}>
+                <td style={{padding:"7px 3px",color:i<3?"#f59e0b":"#94a3b8",fontWeight:700,textAlign:"center"}}>{i+1}</td>
+                <td style={{padding:"7px 3px"}}><div style={{display:"flex",alignItems:"center",gap:5}}><Logo t={t} sz={22}/><span style={{color:"#f1f5f9",fontWeight:600}}>{t.name}</span></div></td>
+                {[t.mp,t.w,t.d,t.l,t.gf,t.ga,t.gd>0?`+${t.gd}`:t.gd].map((v,j)=>(
+                  <td key={j} style={{padding:"7px 3px",color:"#cbd5e1",textAlign:"center"}}>{v}</td>
+                ))}
+                <td style={{padding:"7px 3px",color:"#f59e0b",fontWeight:900,textAlign:"center",fontSize:14}}>{t.pts}</td>
+                <td style={{padding:"7px 3px"}}><div style={{display:"flex"}}>{t.form.slice(-5).map((f,j)=><FB key={j} r={f}/>)}</div></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{color:"#f8fafc",fontSize:13,fontWeight:700,marginBottom:8}}>🟨 แฟร์เพลย์</div>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+        <thead><tr style={{borderBottom:"1px solid #334155"}}>
+          {["#","ทีม","ใบเหลือง","ใบแดง"].map(h=>(
+            <th key={h} style={{padding:"5px 3px",color:"#64748b",textAlign:h==="ทีม"?"left":"center"}}>{h}</th>
+          ))}
+        </tr></thead>
+        <tbody>
+          {[...tb].sort((a,b)=>a.yc-b.yc||a.rc-b.rc).map((t,i)=>(
+            <tr key={t.id} style={{borderBottom:"1px solid #1e293b"}}>
+              <td style={{padding:"6px 3px",color:"#94a3b8",textAlign:"center"}}>{i+1}</td>
+              <td style={{padding:"6px 3px"}}><div style={{display:"flex",alignItems:"center",gap:5}}><Logo t={t} sz={20}/><span style={{color:"#f1f5f9"}}>{t.name}</span></div></td>
+              <td style={{padding:"6px 3px",textAlign:"center",color:"#fcd34d",fontWeight:700}}>🟨{t.yc}</td>
+              <td style={{padding:"6px 3px",textAlign:"center",color:"#fca5a5",fontWeight:700}}>🟥{t.rc}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── ADMIN ──
+function AdminMatches({teams,matches,setMatches,confirm}){
+  const EF={h:"",a:"",d:"",t:"17:00",v:V,st:"กำหนดการ",url:""};
+  const [f,setF]=useState(EF);
+  const [eid,setEid]=useState(null);
+  const [live,setLive]=useState(null);
+  const [eform,setEform]=useState({type:"",player:"",side:"home",min:""});
+  const inp={background:"#1e293b",border:"1px solid #334155",borderRadius:8,padding:"8px 10px",color:"#f1f5f9",fontSize:12,outline:"none",width:"100%",boxSizing:"border-box"};
+  const btn=(bg,c="#fff")=>({background:bg,color:c,border:"none",borderRadius:8,padding:"7px 12px",fontWeight:700,cursor:"pointer",fontSize:12});
+  const save=()=>{
+    if(!f.h||!f.a||!f.d)return alert("กรุณากรอกข้อมูลให้ครบ");
+    if(eid){setMatches(p=>p.map(m=>m.id===eid?{...m,...f,h:+f.h,a:+f.a}:m));setEid(null);}
+    else setMatches(p=>[...p,{id:Date.now(),...f,h:+f.h,a:+f.a,hs:null,as:null,sc:[],yc:[],rc:[]}]);
+    setF(EF);
+  };
+  const submitEvent=()=>{
+    if(!live||!eform.player.trim())return;
+    const tid=eform.side==="home"?live.h:live.a;
+    const min=parseInt(eform.min)||0;
+    if(eform.type==="goal"){
+      const sc=[...(live.sc||[]),{team:tid,player:eform.player.trim(),min}];
+      setLive({...live,sc,hs:sc.filter(s=>s.team===live.h).length,as:sc.filter(s=>s.team===live.a).length});
+    } else if(eform.type==="yellow"){
+      setLive({...live,yc:[...(live.yc||[]),{team:tid,player:eform.player.trim(),min}]});
+    } else if(eform.type==="red"){
+      setLive({...live,rc:[...(live.rc||[]),{team:tid,player:eform.player.trim(),min}]});
+    }
+    setEform({type:"",player:"",side:"home",min:""});
+  };
+  const saveLive=()=>{setMatches(p=>p.map(m=>m.id===live.id?{...live,st:"จบแล้ว"}:m));setLive(null);};
+  return(
+    <div style={{padding:12}}>
+      <div style={{color:"#f59e0b",fontSize:14,fontWeight:700,marginBottom:12}}>📅 จัดการแมตช์</div>
+      <div style={{background:"#1e293b",borderRadius:12,padding:12,marginBottom:12}}>
+        <div style={{color:"#94a3b8",fontSize:12,fontWeight:600,marginBottom:8}}>{eid?"✏️ แก้ไข":"➕ สร้างแมตช์ใหม่"}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          {[["ทีมเจ้าบ้าน","h"],["ทีมเยือน","a"]].map(([label,key])=>(
+            <div key={key}>
+              <div style={{color:"#64748b",fontSize:10,marginBottom:3}}>{label}</div>
+              <select value={f[key]} onChange={e=>setF({...f,[key]:e.target.value})} style={inp}>
+                <option value="">-- เลือก --</option>
+                {teams.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          ))}
+          <div><div style={{color:"#64748b",fontSize:10,marginBottom:3}}>วันที่</div><input type="date" value={f.d} onChange={e=>setF({...f,d:e.target.value})} style={inp}/></div>
+          <div><div style={{color:"#64748b",fontSize:10,marginBottom:3}}>เวลา</div><input type="time" value={f.t} onChange={e=>setF({...f,t:e.target.value})} style={inp}/></div>
+          <div style={{gridColumn:"1/-1"}}><div style={{color:"#64748b",fontSize:10,marginBottom:3}}>สนาม</div><input value={f.v} onChange={e=>setF({...f,v:e.target.value})} style={inp}/></div>
+          <div style={{gridColumn:"1/-1"}}>
+            <div style={{color:"#64748b",fontSize:10,marginBottom:3}}>YouTube ID (ถ่ายทอดสด)</div>
+            <input value={f.url} onChange={e=>setF({...f,url:e.target.value})} placeholder="Video ID 11 ตัว" style={inp}/>
+            {f.url&&/^[A-Za-z0-9_-]{11}$/.test(f.url.trim())&&(
+              <div style={{marginTop:5,display:"flex",alignItems:"center",gap:8}}>
+                <img src={`https://img.youtube.com/vi/${f.url.trim()}/default.jpg`} style={{width:60,height:45,borderRadius:5,objectFit:"cover"}}/>
+                <span style={{color:"#86efac",fontSize:11}}>✅ ID: {f.url.trim()}</span>
+              </div>
+            )}
+          </div>
+          <div style={{gridColumn:"1/-1"}}><div style={{color:"#64748b",fontSize:10,marginBottom:3}}>สถานะ</div>
+            <select value={f.st} onChange={e=>setF({...f,st:e.target.value})} style={inp}>
+              {["กำหนดการ","กำลังแข่ง","จบแล้ว","เลื่อน","ยกเลิก"].map(s=><option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:8,marginTop:10}}>
+          <button onClick={save} style={btn("#059669")}>{eid?"💾 บันทึก":"➕ สร้าง"}</button>
+          {eid&&<button onClick={()=>{setEid(null);setF(EF);}} style={btn("#6b7280")}>ยกเลิก</button>}
+        </div>
+      </div>
+      {live&&(
+        <div style={{background:"#7f1d1d",borderRadius:12,padding:12,marginBottom:12,border:"1px solid #dc2626"}}>
+          <div style={{color:"#fca5a5",fontWeight:700,fontSize:13,marginBottom:4}}>
+            LIVE: {gt(teams,live.h)?.name} vs {gt(teams,live.a)?.name}
+          </div>
+          <div style={{fontSize:30,fontWeight:900,textAlign:"center",color:"#fff",letterSpacing:5,marginBottom:10}}>{live.hs??0} - {live.as??0}</div>
+
+          {/* Event form */}
+          <div style={{background:"#00000033",borderRadius:10,padding:10,marginBottom:10}}>
+            {/* Type selector */}
+            <div style={{display:"flex",gap:6,marginBottom:8}}>
+              {[["goal","⚽ ประตู","#059669"],["yellow","🟨 เหลือง","#d97706"],["red","🟥 ใบแดง","#dc2626"]].map(([type,label,bg])=>(
+                <button key={type} onClick={()=>setEform(p=>({...p,type:p.type===type?"":type}))}
+                  style={{flex:1,background:eform.type===type?bg:"#334155",color:"#fff",border:"none",borderRadius:7,padding:"7px 4px",fontWeight:700,cursor:"pointer",fontSize:11}}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {eform.type&&(
+              <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                {/* Team selector */}
+                <div style={{display:"flex",gap:6}}>
+                  {[["home",gt(teams,live.h)?.name],["away",gt(teams,live.a)?.name]].map(([side,name])=>(
+                    <button key={side} onClick={()=>setEform(p=>({...p,side}))}
+                      style={{flex:1,background:eform.side===side?"#1e40af":"#334155",color:"#fff",border:"none",borderRadius:7,padding:"7px 4px",fontWeight:700,cursor:"pointer",fontSize:11}}>
+                      {name}
+                    </button>
+                  ))}
+                </div>
+                {/* Player name */}
+                <input
+                  value={eform.player}
+                  onChange={e=>setEform(p=>({...p,player:e.target.value}))}
+                  placeholder="ชื่อผู้เล่น"
+                  style={{...inp,background:"#1e293b"}}
+                />
+                {/* Minute */}
+                <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                  <input
+                    type="number" min="0" max="120"
+                    value={eform.min}
+                    onChange={e=>setEform(p=>({...p,min:e.target.value}))}
+                    placeholder="นาที"
+                    style={{...inp,width:80,background:"#1e293b"}}
+                  />
+                  <button onClick={submitEvent}
+                    style={{flex:1,background:"#f59e0b",color:"#0f172a",border:"none",borderRadius:8,padding:"9px 0",fontWeight:800,cursor:"pointer",fontSize:13}}>
+                    ✅ บันทึกเหตุการณ์
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Events log */}
+          {live.sc?.length>0&&(
+            <div style={{marginBottom:6}}>
+              <div style={{color:"#fca5a5",fontSize:11,marginBottom:3}}>⚽ ประตู:</div>
+              {live.sc.map((s,i)=><div key={i} style={{fontSize:11,color:"#f1f5f9"}}>{s.min}' {s.player} ({gt(teams,s.team)?.name})</div>)}
+            </div>
+          )}
+          {live.yc?.length>0&&(
+            <div style={{marginBottom:6}}>
+              <div style={{color:"#fcd34d",fontSize:11,marginBottom:3}}>🟨 ใบเหลือง:</div>
+              {live.yc.map((c,i)=><div key={i} style={{fontSize:11,color:"#f1f5f9"}}>{c.min}' {c.player} ({gt(teams,c.team)?.name})</div>)}
+            </div>
+          )}
+          {live.rc?.length>0&&(
+            <div style={{marginBottom:6}}>
+              <div style={{color:"#fca5a5",fontSize:11,marginBottom:3}}>🟥 ใบแดง:</div>
+              {live.rc.map((c,i)=><div key={i} style={{fontSize:11,color:"#f1f5f9"}}>{c.min}' {c.player} ({gt(teams,c.team)?.name})</div>)}
+            </div>
+          )}
+
+          <div style={{display:"flex",gap:6,marginTop:8}}>
+            <button onClick={saveLive} style={btn("#f59e0b","#0f172a")}>💾 จบแมตช์ & บันทึก</button>
+            <button onClick={()=>setLive(null)} style={btn("#6b7280")}>ยกเลิก</button>
+          </div>
+        </div>
+      )}
+      <div style={{color:"#94a3b8",fontSize:11,marginBottom:6}}>{matches.length} แมตช์ทั้งหมด</div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {[...matches].sort((a,b)=>a.d.localeCompare(b.d)).map(m=>{
+          const h=gt(teams,m.h),a=gt(teams,m.a);
+          if(!h||!a)return null;
+          return(
+            <div key={m.id} style={{background:"#1e293b",borderRadius:8,padding:10,display:"flex",alignItems:"center",gap:8}}>
+              <div style={{flex:1}}>
+                <div style={{color:"#f1f5f9",fontSize:12,fontWeight:600}}>{h.name} vs {a.name}</div>
+                <div style={{fontSize:10,color:"#64748b"}}>{fd(m.d)} {m.t} - {m.st}</div>
+                {m.st==="จบแล้ว"&&<div style={{fontSize:11,color:"#f59e0b",fontWeight:700}}>{m.hs}-{m.as}</div>}
+              </div>
+              <div style={{display:"flex",gap:4}}>
+                <button onClick={()=>setLive({...m})} style={{...btn("#dc2626"),padding:"4px 8px",fontSize:11}}>⚡</button>
+                <button onClick={()=>{setEid(m.id);setF({h:m.h,a:m.a,d:m.d,t:m.t,v:m.v,st:m.st,url:m.url||""});}} style={{...btn("#1e40af"),padding:"4px 8px",fontSize:11}}>✏️</button>
+                <button onClick={()=>confirm(`ลบ ${h.name} vs ${a.name}?`,()=>setMatches(p=>p.filter(x=>x.id!==m.id)))} style={{...btn("#374151"),padding:"4px 8px",fontSize:11}}>🗑</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AdminBanners({banners,setBanners,confirm}){
+  const [f,setF]=useState({name:"",url:"",link:"#",on:true});
+  const inp={background:"#1e293b",border:"1px solid #334155",borderRadius:8,padding:"8px 10px",color:"#f1f5f9",fontSize:12,outline:"none",width:"100%",boxSizing:"border-box"};
+  return(
+    <div style={{padding:12}}>
+      <div style={{color:"#f59e0b",fontSize:14,fontWeight:700,marginBottom:12}}>🎯 แบนเนอร์</div>
+      <div style={{background:"#1e293b",borderRadius:12,padding:12,marginBottom:12}}>
+        {[["ชื่อ","name"],["URL รูป (800x80)","url"],["ลิงก์","link"]].map(([l,k])=>(
+          <div key={k} style={{marginBottom:8}}>
+            <div style={{color:"#64748b",fontSize:10,marginBottom:3}}>{l}</div>
+            <input value={f[k]} onChange={e=>setF({...f,[k]:e.target.value})} style={inp}/>
+          </div>
+        ))}
+        {f.url&&<img src={f.url} style={{width:"100%",maxHeight:60,objectFit:"cover",borderRadius:6,marginBottom:8}} onError={e=>e.target.style.display="none"}/>}
+        <button onClick={()=>{if(!f.name||!f.url)return alert("ใส่ชื่อและ URL");setBanners(p=>[...p,{id:Date.now(),...f}]);setF({name:"",url:"",link:"#",on:true});}}
+          style={{background:"#059669",color:"#fff",border:"none",borderRadius:8,padding:"8px 14px",fontWeight:700,cursor:"pointer",fontSize:12}}>➕ เพิ่มแบนเนอร์</button>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {banners.map(b=>(
+          <div key={b.id} style={{background:"#1e293b",borderRadius:8,padding:10,opacity:b.on?1:0.5}}>
+            <img src={b.url} style={{width:"100%",maxHeight:50,objectFit:"cover",borderRadius:5,marginBottom:6}} onError={e=>e.target.style.display="none"}/>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{flex:1,color:"#f1f5f9",fontSize:12,fontWeight:600}}>{b.name}</span>
+              <button onClick={()=>setBanners(p=>p.map(x=>x.id===b.id?{...x,on:!x.on}:x))}
+                style={{background:b.on?"#d97706":"#059669",color:"#fff",border:"none",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer",fontWeight:700}}>{b.on?"ปิด":"เปิด"}</button>
+              <button onClick={()=>confirm(`ลบ "${b.name}"?`,()=>setBanners(p=>p.filter(x=>x.id!==b.id)))}
+                style={{background:"#374151",color:"#fff",border:"none",borderRadius:6,padding:"4px 8px",fontSize:11,cursor:"pointer"}}>🗑</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminSettings({onReset}){
+  return(
+    <div style={{padding:12}}>
+      <div style={{color:"#f59e0b",fontSize:14,fontWeight:700,marginBottom:12}}>⚙️ ตั้งค่า</div>
+      <div style={{background:"#1e293b",borderRadius:12,padding:14,marginBottom:12}}>
+        <div style={{color:"#94a3b8",fontWeight:600,marginBottom:8}}>🔄 รีเซ็ตข้อมูล</div>
+        <div style={{fontSize:12,color:"#64748b",marginBottom:10,lineHeight:1.7}}>ล้างข้อมูลเก่าและโหลด <b style={{color:"#f59e0b"}}>โป่งลีกคัพ 2569</b> ใหม่ทั้งหมด</div>
+        <button onClick={onReset} style={{background:"#dc2626",color:"#fff",border:"none",borderRadius:8,padding:"10px 14px",fontWeight:700,cursor:"pointer",fontSize:12,width:"100%"}}>
+          🔄 รีเซ็ตข้อมูล โป่งลีกคัพ 2569
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── APP ──
+export default function App(){
+  const [matches,setMatchesRaw,mReady]=useSave("pm",MATCHES_INIT);
+  const [banners,setBannersRaw,bReady]=useSave("pb",BANNERS_INIT);
+  const teams=TEAMS;
+  const setMatches=(v)=>setMatchesRaw(typeof v==="function"?v(matches):v);
+  const setBanners=(v)=>setBannersRaw(typeof v==="function"?v(banners):v);
+  if(!mReady||!bReady) return (
+    <div style={{minHeight:"100vh",background:"#0f172a",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}>
+      <div style={{fontSize:52}}>⚽</div>
+      <div style={{color:"#f59e0b",fontSize:16,fontWeight:700}}>กำลังโหลดข้อมูล...</div>
+      <div style={{color:"#64748b",fontSize:12}}>เชื่อมต่อ Firebase...</div>
+    </div>
+  );
+  const [page,setPage]=useState("home");
+  const [isAdmin,setIsAdmin]=useState(false);
+  const [pass,setPass]=useState("");
+  const [atab,setAtab]=useState("matches");
+  const [conf,setConf]=useState(null);
+  const ask=(msg,fn)=>setConf({msg,fn});
+  const reset=()=>ask("รีเซ็ตข้อมูลทั้งหมด?",()=>{
+    localStorage.removeItem("pm");localStorage.removeItem("pb");window.location.reload();
+  });
+  const NAV=[{k:"home",i:"🏠",l:"หน้าแรก"},{k:"fixtures",i:"📅",l:"ตาราง"},{k:"standings",i:"🏆",l:"คะแนน"},{k:"admin",i:"⚙️",l:"แอดมิน"}];
+  const ATABS=[{k:"matches",i:"📅",l:"แมตช์"},{k:"banners",i:"🎯",l:"แบนเนอร์"},{k:"settings",i:"⚙️",l:"ตั้งค่า"}];
+  return(
+    <div style={{minHeight:"100vh",background:"#0f172a",color:"#f8fafc",fontFamily:"'Noto Sans Thai','Sarabun',sans-serif",maxWidth:480,margin:"0 auto",paddingBottom:64}}>
+      {conf&&<Confirm msg={conf.msg} onOk={()=>{conf.fn();setConf(null);}} onCancel={()=>setConf(null)}/>}
+      <div style={{background:"linear-gradient(135deg,#0f172a,#1e3a5f)",padding:"10px 12px",display:"flex",alignItems:"center",gap:10,position:"sticky",top:0,zIndex:100,borderBottom:"1px solid #1e293b"}}>
+        <div style={{width:32,height:32,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#dc2626)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>⚽</div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>โป่งลีกคัพ 2569</div>
+          <div style={{fontSize:10,color:"#64748b"}}>สนามกีฬาหน้าเทศบาลตำบลโป่ง</div>
+        </div>
+        {isAdmin&&<button onClick={()=>{setIsAdmin(false);setPage("home");}} style={{background:"#dc2626",color:"#fff",border:"none",borderRadius:8,padding:"4px 10px",fontSize:11,cursor:"pointer",fontWeight:600,flexShrink:0}}>ออก</button>}
+      </div>
+      {page==="home"&&<Home teams={teams} matches={matches} banners={banners}/>}
+      {page==="fixtures"&&<Fixtures teams={teams} matches={matches}/>}
+      {page==="standings"&&<Standings teams={teams} matches={matches}/>}
+      {page==="admin"&&!isAdmin&&(
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:40,minHeight:380}}>
+          <div style={{fontSize:48,marginBottom:14}}>🔒</div>
+          <div style={{color:"#f1f5f9",fontSize:16,fontWeight:700,marginBottom:6}}>เข้าสู่ระบบแอดมิน</div>
+          <div style={{color:"#64748b",fontSize:12,marginBottom:18}}>รหัส: admin1234</div>
+          <input type="password" value={pass} onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(pass==="admin1234"?setIsAdmin(true):alert("รหัสผิด"))}
+            placeholder="รหัสผ่าน" style={{background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"11px 16px",color:"#f1f5f9",fontSize:14,outline:"none",width:230,textAlign:"center",marginBottom:12}}/>
+          <button onClick={()=>pass==="admin1234"?setIsAdmin(true):alert("รหัสผิด")}
+            style={{background:"#f59e0b",color:"#0f172a",border:"none",borderRadius:10,padding:"11px 32px",fontWeight:800,fontSize:14,cursor:"pointer",width:230}}>เข้าสู่ระบบ</button>
+        </div>
+      )}
+      {page==="admin"&&isAdmin&&(
+        <div>
+          <div style={{display:"flex",background:"#0f172a",borderBottom:"1px solid #1e293b"}}>
+            {ATABS.map(n=>(
+              <button key={n.k} onClick={()=>setAtab(n.k)} style={{flex:1,padding:"9px 4px",background:"none",border:"none",borderBottom:atab===n.k?"2px solid #f59e0b":"2px solid transparent",color:atab===n.k?"#f59e0b":"#64748b",fontSize:11,fontWeight:600,cursor:"pointer"}}>
+                <div style={{fontSize:15}}>{n.i}</div>{n.l}
+              </button>
+            ))}
+          </div>
+          {atab==="matches"&&<AdminMatches teams={teams} matches={matches} setMatches={setMatches} confirm={ask}/>}
+          {atab==="banners"&&<AdminBanners banners={banners} setBanners={setBanners} confirm={ask}/>}
+          {atab==="settings"&&<AdminSettings onReset={reset}/>}
+        </div>
+      )}
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:"#0f172a",borderTop:"1px solid #1e293b",display:"flex",zIndex:200}}>
+        {NAV.map(n=>(
+          <button key={n.k} onClick={()=>setPage(n.k)} style={{flex:1,padding:"7px 2px 9px",background:"none",border:"none",borderTop:page===n.k?"2px solid #f59e0b":"2px solid transparent",color:page===n.k?"#f59e0b":"#64748b",fontSize:10,fontWeight:600,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+            <span style={{fontSize:18}}>{n.i}</span>{n.l}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
